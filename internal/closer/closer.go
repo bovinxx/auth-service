@@ -11,6 +11,13 @@ var (
 	globalCloser = New()
 )
 
+type Closer struct {
+	mu    sync.Mutex
+	once  sync.Once
+	done  chan struct{}
+	funcs []func() error
+}
+
 func Add(f ...func() error) {
 	globalCloser.Add(f...)
 }
@@ -21,13 +28,6 @@ func Wait() {
 
 func CloseAll() {
 	globalCloser.CloseAll()
-}
-
-type Closer struct {
-	mu    sync.Mutex
-	once  sync.Once
-	done  chan struct{}
-	funcs []func() error
 }
 
 func New(sig ...os.Signal) *Closer {

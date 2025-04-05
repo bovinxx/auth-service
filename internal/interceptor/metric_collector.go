@@ -8,7 +8,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-func MetricsInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func MetricsInterceptor(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (interface{}, error) {
 	metrics.IncRequestCounter()
 
 	timeStart := time.Now()

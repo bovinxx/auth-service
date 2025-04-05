@@ -22,6 +22,7 @@ linters:
     - gofmt       # Форматирование
     - goimports   # Импорты
     - gci         # Порядок импортов
+    - lll         # Long line linter
    
     # Качество кода
     - gocritic    # 150+ правил качества
@@ -37,6 +38,8 @@ linters:
     - unconvert   # Лишние преобразования типов
 
 linters-settings:
+  lll:
+    line-length: 120
   gocyclo:
     min-complexity: 15  # Функции сложнее этого порога будут отмечены
   gocritic:
