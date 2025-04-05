@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/bovinxx/auth-service/api/user_v1;user_v1";
+
+service UserService {
+    rpc Create(CreateRequest) returns (CreateResponse) {
+        option (google.api.http) = {
+            post: "/auth-service/v1/create"
+            body: "*"
+        };
+    }
+    rpc Get(GetRequest) returns (GetResponse) {
+        option (google.api.http) = {
+            get: "/auth-service/v1/get"
+        };
+    }
+    rpc Update(UpdateRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/auth-service/v1/update"
+            body: "*"
+        };
+    }
+    rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/auth-service/v1/delete"
+        };
+    }
+};
+
+message CreateRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+    bool is_admin = 4;
+};
+
+message CreateResponse {
+    int64 id = 1;
+};
+
+message GetRequest {
+    int64 id = 1;
+};
+
+message GetResponse {
+    int64 id = 1;
+    string name = 2;
+    string email = 3;
+    bool is_admin = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+};
+
+message UpdateRequest {
+    int64 id = 1;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue old_password = 3;
+    google.protobuf.StringValue new_password = 4;
+};
+
+message DeleteRequest {
+    int64 id = 1;
+};

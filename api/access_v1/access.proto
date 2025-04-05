@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package access;
+
+import "google/protobuf/empty.proto";
+
+option go_package="github.com/bovinxx/auth/api/access_v1;access_v1";
+
+service AccessService {
+    rpc Check(CheckRequest) returns (google.protobuf.Empty);
+};
+
+message CheckRequest {
+    string endpoint_address = 1;
+};
