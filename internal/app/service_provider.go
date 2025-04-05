@@ -12,8 +12,8 @@ import (
 	"github.com/bovinxx/auth-service/internal/client/db/transaction"
 	"github.com/bovinxx/auth-service/internal/closer"
 	"github.com/bovinxx/auth-service/internal/config"
-	repository "github.com/bovinxx/auth-service/internal/repository/user"
-	userRepo "github.com/bovinxx/auth-service/internal/repository/user/user"
+	userRepo "github.com/bovinxx/auth-service/internal/repository/user"
+	userRepoImpl "github.com/bovinxx/auth-service/internal/repository/user/user"
 	service "github.com/bovinxx/auth-service/internal/services"
 	userService "github.com/bovinxx/auth-service/internal/services/user/user"
 	redigo "github.com/gomodule/redigo/redis"
@@ -32,7 +32,7 @@ type serviceProvider struct {
 	redisPool *redigo.Pool
 	txManager db.TxManager
 
-	userRepo repository.UserRepository
+	userRepo userRepo.Repository
 
 	userService service.UserService
 	// authService   service.AuthService
@@ -163,9 +163,9 @@ func (s *serviceProvider) RedisConfig() config.RedisConfig {
 	return s.redisConfig
 }
 
-func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
+func (s *serviceProvider) UserRepository(ctx context.Context) userRepo.Repository {
 	if s.userRepo == nil {
-		repo, err := userRepo.NewRepository(s.DBClient(ctx))
+		repo, err := userRepoImpl.NewRepository(s.DBClient(ctx))
 		if err != nil {
 			log.Fatalf("failed to create repository: %v", err)
 		}

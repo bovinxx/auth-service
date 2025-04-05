@@ -10,8 +10,8 @@ import (
 
 func GenerateToken(info models.UserInfo, secretKey []byte, duration time.Duration) (string, error) {
 	claims := models.UserClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(duration).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
 		},
 		Username: info.Login,
 	}

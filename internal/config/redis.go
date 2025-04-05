@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"fmt"
+	"net"
 	"os"
 	"strconv"
 	"time"
@@ -35,22 +35,22 @@ type redis struct {
 
 func NewRedisConfig() (*redis, error) {
 	host := os.Getenv(redisHostEnvName)
-	if len(host) == 0 {
+	if host == "" {
 		return nil, errors.New("redis host not found")
 	}
 
 	port := os.Getenv(redisPortEnvName)
-	if len(port) == 0 {
+	if port == "" {
 		return nil, errors.New("redis port not found")
 	}
 
 	password := os.Getenv(redisPasswordEnvName)
-	if len(password) == 0 {
+	if password == "" {
 		return nil, errors.New("redis password not found")
 	}
 
 	maxIdleStr := os.Getenv(redisMaxIdleEnvName)
-	if len(maxIdleStr) == 0 {
+	if maxIdleStr == "" {
 		return nil, errors.New("redis max idle not found")
 	}
 
@@ -60,7 +60,7 @@ func NewRedisConfig() (*redis, error) {
 	}
 
 	idleTimeoutStr := os.Getenv(redisIdleTimeoutEnvName)
-	if len(idleTimeoutStr) == 0 {
+	if idleTimeoutStr == "" {
 		return nil, errors.New("redis idle timeout not found")
 	}
 
@@ -70,7 +70,7 @@ func NewRedisConfig() (*redis, error) {
 	}
 
 	connectionTimeoutStr := os.Getenv(redisConnectionTimeoutEnvName)
-	if len(connectionTimeoutStr) == 0 {
+	if connectionTimeoutStr == "" {
 		return nil, errors.New("redis connection timeout not found")
 	}
 
@@ -80,7 +80,7 @@ func NewRedisConfig() (*redis, error) {
 	}
 
 	return &redis{
-		address:           fmt.Sprintf("%s:%s", host, port),
+		address:           net.JoinHostPort(host, port),
 		password:          password,
 		maxIdle:           maxIdle,
 		idleTimeout:       idleTimeout,

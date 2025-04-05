@@ -5,10 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
-
 	"github.com/bovinxx/auth-service/internal/client/cache"
 	"github.com/bovinxx/auth-service/internal/config"
+	"github.com/gomodule/redigo/redis"
 )
 
 var _ cache.RedisClient = (*client)(nil)

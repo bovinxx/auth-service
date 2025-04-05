@@ -61,7 +61,7 @@ func IncRequestCounter() {
 	metrics.requestCounter.Inc()
 }
 
-func IncResponseCounter(status string, method string) {
+func IncResponseCounter(status, method string) {
 	metrics.responseCounter.WithLabelValues(status, method).Inc()
 }
 

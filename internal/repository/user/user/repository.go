@@ -28,7 +28,7 @@ type repo struct {
 	db db.Client
 }
 
-func NewRepository(db db.Client) (userRepo.UserRepository, error) {
+func NewRepository(db db.Client) (userRepo.Repository, error) {
 	return &repo{
 		db: db,
 	}, nil

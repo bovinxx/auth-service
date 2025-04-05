@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"fmt"
+	"net"
 	"os"
 )
 
@@ -16,27 +16,25 @@ type HTTPConfig interface {
 }
 
 type httpConfig struct {
-	host string
-	port string
+	address string
 }
 
 func NewHTTPConfig() (*httpConfig, error) {
 	host := os.Getenv(httpHostEnvName)
-	if len(host) == 0 {
+	if host == "" {
 		return nil, errors.New("http host not found")
 	}
 
 	port := os.Getenv(httpPortEnvName)
-	if len(port) == 0 {
+	if port == "" {
 		return nil, errors.New("http port not found")
 	}
 
 	return &httpConfig{
-		host: host,
-		port: port,
+		address: net.JoinHostPort(host, port),
 	}, nil
 }
 
 func (cfg *httpConfig) Address() string {
-	return fmt.Sprintf("%s:%s", cfg.host, cfg.port)
+	return cfg.address
 }

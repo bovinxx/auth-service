@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	RATE_LIMIT = 100
+	rateLimit = 100
 )
 
 var (
-	rateLimiter = ratelimiter.NewTokenBucketLimiter(context.Background(), RATE_LIMIT, time.Second)
+	rateLimiter = ratelimiter.NewTokenBucketLimiter(context.Background(), rateLimit, time.Second)
 )
 
 func RateLimiterInterceptor(

@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 
-	_ "net/http/pprof"
-
 	"github.com/bovinxx/auth-service/internal/app"
 )
 
@@ -16,10 +14,6 @@ func init() {
 }
 
 func main() {
-	// go func() {
-	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
-	// }()
-
 	flag.Parse()
 	ctx := context.Background()
 

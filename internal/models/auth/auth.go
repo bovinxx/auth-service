@@ -8,7 +8,7 @@ type UserInfo struct {
 }
 
 type UserClaims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	Username string
 	Role     string
 }

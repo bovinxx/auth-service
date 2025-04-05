@@ -4,8 +4,6 @@ import (
 	"context"
 
 	models "github.com/bovinxx/auth-service/internal/models/user"
-	// descAccess "github.com/bovinxx/auth-service/pkg/user_v1/access"
-	// descAuth "github.com/bovinxx/auth/pkg/user_v1/auth"
 )
 
 type UserService interface {

@@ -107,5 +107,4 @@ func logQuery(ctx context.Context, q db.Query, args ...interface{}) {
 		fmt.Sprintf("sql: %s", q.Name),
 		fmt.Sprintf("query: %s", prettyQuery),
 	)
-	return
 }

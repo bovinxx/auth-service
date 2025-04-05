@@ -1,0 +1,55 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - vendor.protogen
+    - pkg
+    - bin
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+
+linters:
+  disable-all: true
+  enable:
+    # Базовые проверки
+    - govet       # Проверка корректности кода
+    - errcheck    # Проверка обработки ошибок
+    - staticcheck # Статический анализ
+    - unused      # Неиспользуемый код
+   
+    # Code style
+    - gofmt       # Форматирование
+    - goimports   # Импорты
+    - gci         # Порядок импортов
+   
+    # Качество кода
+    - gocritic    # 150+ правил качества
+    - revive      # Улучшенный golint
+    - gosimple    # Упрощение кода
+   
+    # Сложность
+    - gocyclo     # Цикломатическая сложность
+    - nestif      # Вложенные if
+   
+    # Оптимизации
+    - prealloc    # Предварительное выделение памяти
+    - unconvert   # Лишние преобразования типов
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15  # Функции сложнее этого порога будут отмечены
+  gocritic:
+    enabled-tags:
+      - performance
+      - style
+    disabled-checks:
+      - hugeParam       # Игнорировать предупреждения о больших параметрах
+  revive:
+    rules:
+      - name: error-return
+      - name: error-strings
+      - name: exported
+      - name: if-return
+      - name: var-naming
+      - name: receiver-naming
