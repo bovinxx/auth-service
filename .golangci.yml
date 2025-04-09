@@ -1,0 +1,72 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - vendor.protogen
+    - pkg
+    - bin
+  build-tags: ""
+  build:
+    no-vcs: true  # Отключить VCS check
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+
+linters:
+  enable:
+    - revive         # Современная замена golint
+    - errcheck
+    - gocyclo
+    - gofmt
+    - goimports
+    - misspell
+    - staticcheck
+    - funlen
+    - unparam
+    - dupl
+    - ineffassign
+    - prealloc
+    - bodyclose
+    - gocritic       # Для архитектурных проблем (оставляем включенным)
+
+issues:
+  exclude:
+    - "error return value not checked.*(Close|Log|Exit)"
+    - "should have 2 args, not 3"
+
+max-line-length: 120
+funlen:
+  lines: 50
+  statements: 30
+  comments: 5
+
+gofmt:
+  simplify: true
+
+misspell:
+  locale: en_US
+
+revive:
+  confidence: 0.8
+  severity: warning
+  rules:
+    - name: indent-error-flow
+    - name: var-naming
+    - name: blank-imports
+    - name: import-shadowing
+    - name: time-naming
+    - name: dot-imports
+    - name: error-return
+    - name: range-val-in-closure
+
+gocritic:
+  enabled-checks:
+    - commentFormatting
+    - ifElseChain
+    - sloppyLen
+    - dupImport
+    - hugeParam
+    - captLocal
+    - typeSwitchVar
+    - whyNoLint
+

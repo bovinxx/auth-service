@@ -1,0 +1,4 @@
+bin
+local.env
+logs
+vendor.protogen

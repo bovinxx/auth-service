@@ -1,0 +1,237 @@
+package app
+
+import (
+	"context"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"sync"
+
+	"github.com/bovinxx/auth-service/internal/closer"
+	"github.com/bovinxx/auth-service/internal/config"
+	"github.com/bovinxx/auth-service/internal/interceptor"
+	"github.com/bovinxx/auth-service/internal/logger"
+	"github.com/bovinxx/auth-service/internal/metrics"
+	descAccess "github.com/bovinxx/auth-service/pkg/access_v1"
+	descAuth "github.com/bovinxx/auth-service/pkg/auth_v1"
+	descUser "github.com/bovinxx/auth-service/pkg/user_v1"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/natefinch/lumberjack"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
+)
+
+type App struct {
+	serviceProvider *serviceProvider
+	grpcServer      *grpc.Server
+	httpServer      *http.Server
+}
+
+func NewApp(ctx context.Context) (*App, error) {
+	a := &App{}
+
+	if err := a.initDeps(ctx); err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}
+
+func (a *App) Start(ctx context.Context) error {
+	logger.Init(getCore(getAtomicLevel()))
+
+	err := metrics.Init(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		closer.CloseAll()
+		closer.Wait()
+	}()
+
+	wg := sync.WaitGroup{}
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+
+		err := a.runGRPCServer()
+		if err != nil {
+			log.Fatalf("failed to run GRPC server: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		err := a.runHTTPServer()
+		if err != nil {
+			log.Fatalf("failed to run HTTP server: %v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		err := a.runPrometheusHTTPServer()
+		if err != nil {
+			log.Fatalf("failed to run Prometheus HTTP server: %v", err)
+		}
+	}()
+
+	wg.Wait()
+	return nil
+}
+
+func (a *App) initDeps(ctx context.Context) error {
+	inits := []func(context.Context) error{
+		a.initConfig,
+		a.initServiceProvider,
+		a.initGRPCServer,
+		a.initHTTPServer,
+	}
+
+	for _, init := range inits {
+		if err := init(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (a *App) initConfig(_ context.Context) error {
+	err := config.Load("local.env")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) initServiceProvider(ctx context.Context) error {
+	a.serviceProvider = newServiceProvider()
+	return nil
+}
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.ChainUnaryInterceptor(interceptor.RateLimiterInterceptor, interceptor.MetricsInterceptor),
+	)
+
+	reflection.Register(a.grpcServer)
+
+	descUser.RegisterUserServiceServer(a.grpcServer, a.serviceProvider.UserImplementation(ctx))
+	descAuth.RegisterAuthServiceServer(a.grpcServer, a.serviceProvider.AuthImplementation(ctx))
+	descAccess.RegisterAccessServiceServer(a.grpcServer, a.serviceProvider.AccessImplementation(ctx))
+
+	return nil
+}
+
+func (a *App) initHTTPServer(ctx context.Context) error {
+	mux := runtime.NewServeMux()
+
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	err := descUser.RegisterUserServiceHandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
+	if err != nil {
+		return err
+	}
+
+	a.httpServer = &http.Server{
+		Addr:    a.serviceProvider.HTTPConfig().Address(),
+		Handler: mux,
+	}
+
+	return nil
+}
+
+func (a *App) runPrometheusHTTPServer() error {
+	log.Printf("Prometheus HTTP server is running on %s", a.serviceProvider.PrometheusConfig().Address())
+
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	prometheusServer := &http.Server{
+		Addr:    a.serviceProvider.PrometheusConfig().Address(),
+		Handler: mux,
+	}
+
+	err := prometheusServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) runGRPCServer() error {
+	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
+
+	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
+	if err != nil {
+		return err
+	}
+
+	err = a.grpcServer.Serve(list)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) runHTTPServer() error {
+	log.Printf("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Address())
+
+	err := a.httpServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getCore(level zap.AtomicLevel) zapcore.Core {
+	stdout := zapcore.AddSync(os.Stdout)
+
+	file := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "logs/app.log",
+		MaxSize:    10, // megabytes
+		MaxBackups: 3,
+		MaxAge:     7, // days
+	})
+
+	productionCfg := zap.NewProductionEncoderConfig()
+	productionCfg.TimeKey = "timestamp"
+	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	developmentCfg := zap.NewDevelopmentEncoderConfig()
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
+	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
+
+	return zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, stdout, level),
+		zapcore.NewCore(fileEncoder, file, level),
+	)
+}
+
+func getAtomicLevel() zap.AtomicLevel {
+	var level zapcore.Level
+	if err := level.Set("info"); err != nil {
+		log.Fatalf("failed to set log level: %v", err)
+	}
+
+	return zap.NewAtomicLevelAt(level)
+}
