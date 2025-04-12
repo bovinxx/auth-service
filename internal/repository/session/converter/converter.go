@@ -2,7 +2,7 @@ package converter
 
 import (
 	"github.com/bovinxx/auth-service/internal/models"
-	"github.com/bovinxx/auth-service/internal/repository/session/session/model"
+	"github.com/bovinxx/auth-service/internal/repository/session/model"
 )
 
 func ToSessionFromRepo(session *model.Session) *models.Session {

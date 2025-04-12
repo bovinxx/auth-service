@@ -1,4 +1,4 @@
-bin
-local.env
-logs
+infra/bin
+configs
+storage/logs
 vendor.protogen

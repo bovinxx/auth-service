@@ -1,16 +1,22 @@
 package access
 
 import (
-	accessService "github.com/bovinxx/auth-service/internal/services/access"
+	"context"
+
 	desc "github.com/bovinxx/auth-service/pkg/access_v1"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+type AccessService interface {
+	Check(ctx context.Context, req *desc.CheckRequest) (*emptypb.Empty, error)
+}
 
 type Implementation struct {
 	desc.UnimplementedAccessServiceServer
-	service accessService.Service
+	service AccessService
 }
 
-func NewImplementation(service accessService.Service) *Implementation {
+func NewImplementation(service AccessService) *Implementation {
 	return &Implementation{
 		service: service,
 	}
