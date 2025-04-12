@@ -2,7 +2,7 @@ package converter
 
 import (
 	"github.com/bovinxx/auth-service/internal/models"
-	"github.com/bovinxx/auth-service/internal/repository/user/user/model"
+	"github.com/bovinxx/auth-service/internal/repository/user/model"
 )
 
 func ToUserFromRepo(user *model.User) *models.User {

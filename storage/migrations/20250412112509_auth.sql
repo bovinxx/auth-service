@@ -5,7 +5,7 @@ create table users (
     name text unique not null,
     email text not null,
     password text not null,
-    is_admin boolean not null
+    role text not null
 );
 
 CREATE UNIQUE INDEX idx_users_username ON users(name);

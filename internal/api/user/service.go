@@ -1,16 +1,25 @@
 package user
 
 import (
-	userService "github.com/bovinxx/auth-service/internal/services/user"
+	"context"
+
+	"github.com/bovinxx/auth-service/internal/models"
 	desc "github.com/bovinxx/auth-service/pkg/user_v1"
 )
 
-type Implementation struct {
-	desc.UnimplementedUserServiceServer
-	service userService.Service
+type UserService interface {
+	CreateUser(ctx context.Context, user *models.User) (int64, error)
+	GetUser(ctx context.Context, id int64) (*models.User, error)
+	UpdateUser(ctx context.Context, id int64, oldPassword, newPassword string) error
+	DeleteUser(ctx context.Context, id int64) error
 }
 
-func NewImplementation(service userService.Service) *Implementation {
+type Implementation struct {
+	desc.UnimplementedUserServiceServer
+	service UserService
+}
+
+func NewImplementation(service UserService) *Implementation {
 	return &Implementation{
 		service: service,
 	}

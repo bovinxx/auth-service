@@ -1,6 +1,6 @@
-include local.env
+include ./configs/local.env
 
-LOCAL_BIN:=$(CURDIR)/bin
+LOCAL_BIN:=$(CURDIR)/infra/bin
 LOCAL_MIGRATION_DIR=${MIGRATION_DIR}
 LOCAL_MIGRATION_DSN="host=localhost port=${PG_PORT} dbname=${PG_DATABASE_NAME} user=${PG_USER} password=${PG_PASSWORD}"
 
@@ -22,32 +22,32 @@ install-deps:
 
 generate_user_api:
 	mkdir -p pkg/user_v1
-	protoc --proto_path api/user_v1 --proto_path vendor.protogen \
+	protoc --proto_path proto/user_v1 --proto_path vendor.protogen \
 	--go_out=pkg/user_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	--grpc-gateway_out=pkg/user_v1 --grpc-gateway_opt=paths=source_relative \
 	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
-	api/user_v1/user.proto
+	proto/user_v1/user.proto
 
 generate_auth_api:
 	mkdir -p pkg/auth_v1
-	protoc --proto_path api/auth_v1 --proto_path vendor.protogen \
+	protoc --proto_path proto/auth_v1 --proto_path vendor.protogen \
 	--go_out=pkg/auth_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/auth_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	api/auth_v1/auth.proto
+	proto/auth_v1/auth.proto
 
 generate_access_api:
 	mkdir -p pkg/access_v1
-	protoc --proto_path api/access_v1/ --proto_path vendor.protogen \
+	protoc --proto_path proto/access_v1/ --proto_path vendor.protogen \
 	--go_out=pkg/access_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/access_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	api/access_v1/access.proto
+	proto/access_v1/access.proto
 
 vendor-proto:
 		@if [ ! -d vendor.protogen/google ]; then \
@@ -81,7 +81,7 @@ test:
 .PHONY: test-coverage
 test-coverage:
 	go clean -testcache
-	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/bovinxx/auth/internal/service/user/...,github.com/bovinxx/auth/internal/api/user... -count 5
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/bovinxx/auth-service/internal/service/user/...,github.com/bovinxx/auth-service/internal/api/user... -count 5
 	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
 	rm coverage.tmp.out
 	go tool cover -html=coverage.out;
@@ -89,8 +89,8 @@ test-coverage:
 	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
 
 grpc-load-test:
-	/home/bovinxx/Downloads/ghz \
-		--proto api/auth_v1/auth.proto \
+	ghz \
+		--proto proto/auth_v1/auth.proto \
 		--call auth.AuthService.Login \
 		--data '{ "username": "bovinxx", "password": "bovinxx" }' \
 		--rps 50 \

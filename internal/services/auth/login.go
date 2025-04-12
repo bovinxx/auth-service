@@ -2,10 +2,10 @@ package auth
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/bovinxx/auth-service/internal/models"
+	serverrs "github.com/bovinxx/auth-service/internal/services/auth/errors"
 	"github.com/bovinxx/auth-service/internal/utils"
 	"github.com/pkg/errors"
 )
@@ -25,10 +25,9 @@ func (s *serv) Login(ctx context.Context, req *models.User) (string, error) {
 	}
 
 	if !utils.VerifyPassword(user.Password, req.Password) || (req.Role != user.Role) {
-		return "", errors.New("invalid credentials")
+		return "", serverrs.ErrInvalidCredentials
 	}
 
-	log.Println("login userID", user.ID)
 	refreshToken, err := utils.GenerateToken(
 		models.UserInfo{
 			UserID:   user.ID,

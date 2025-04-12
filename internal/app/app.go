@@ -107,7 +107,7 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	err := config.Load("local.env")
+	err := config.Load("./configs/local.env")
 	if err != nil {
 		return err
 	}
