@@ -33,6 +33,7 @@ type App struct {
 }
 
 func NewApp(ctx context.Context) (*App, error) {
+	logger.Init(getCore(getAtomicLevel()))
 	a := &App{}
 
 	if err := a.initDeps(ctx); err != nil {
@@ -43,8 +44,6 @@ func NewApp(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Start(ctx context.Context) error {
-	logger.Init(getCore(getAtomicLevel()))
-
 	err := metrics.Init(ctx)
 	if err != nil {
 		return err
@@ -123,7 +122,10 @@ func (a *App) initServiceProvider(ctx context.Context) error {
 func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
-		grpc.ChainUnaryInterceptor(interceptor.RateLimiterInterceptor, interceptor.MetricsInterceptor),
+		grpc.ChainUnaryInterceptor(
+			interceptor.RateLimiterInterceptor,
+			interceptor.MetricsInterceptor,
+			interceptor.AuthzInterceptor(a.serviceProvider.AccessService(ctx))),
 	)
 
 	reflection.Register(a.grpcServer)

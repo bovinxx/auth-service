@@ -2,18 +2,26 @@ package access
 
 import (
 	"context"
+	"time"
 
 	"github.com/bovinxx/auth-service/internal/client/cache"
 	"github.com/bovinxx/auth-service/internal/config"
 	"github.com/bovinxx/auth-service/internal/models"
-	"github.com/bovinxx/auth-service/internal/services/access/errors"
-	"github.com/bovinxx/auth-service/internal/utils"
-	desc "github.com/bovinxx/auth-service/pkg/access_v1"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+type Role string
+
+type Rule struct {
+	AllowedRoles []Role
+	IsPublic     bool
+}
+
 const (
-	authPrefix = "Bearer: "
+	RoleAdmin             Role = "admin"
+	RoleUser              Role = "user"
+	authPrefix                 = "Bearer: "
+	sessionCacheKeyPrefix      = "auth:session:sessionID"
+	cacheExpTime               = 10 * time.Minute
 )
 
 type userRepository interface {
@@ -27,41 +35,44 @@ type sessionRepository interface {
 }
 
 type serv struct {
-	userRepo    userRepository
-	sessionRepo sessionRepository
-	cache       cache.RedisClient
-	jwtConfig   config.JWTConfig
-	checker     Checker
+	userRepo     userRepository
+	sessionRepo  sessionRepository
+	cache        cache.RedisClient
+	jwtConfig    config.JWTConfig
+	accessConfig config.AccessConfig
+	checker      Checker
 }
 
 func NewService(
 	repo userRepository,
 	sessionRepo sessionRepository,
 	cache cache.RedisClient,
-	jwtConfig config.JWTConfig) *serv {
+	jwtConfig config.JWTConfig,
+	accessConfig config.AccessConfig) *serv {
 	return &serv{
-		userRepo:    repo,
-		sessionRepo: sessionRepo,
-		cache:       cache,
-		jwtConfig:   jwtConfig,
-		checker:     NewStaticChecker(nil),
+		userRepo:     repo,
+		sessionRepo:  sessionRepo,
+		cache:        cache,
+		jwtConfig:    jwtConfig,
+		accessConfig: accessConfig,
+		checker:      NewStaticChecker(buildRulesFromConfig(accessConfig.AccessRule())),
 	}
 }
 
-func (s *serv) Check(ctx context.Context, req *desc.CheckRequest) (*emptypb.Empty, error) {
-	accessToken, err := extractBearerToken(ctx)
-	if err != nil {
-		return nil, err
+func buildRulesFromConfig(cfg map[string]config.AccessRuleConfig) map[string]Rule {
+	rules := make(map[string]Rule)
+
+	for endpoint, rule := range cfg {
+		roles := make([]Role, 0, len(rule.Role))
+		for _, r := range rule.Role {
+			roles = append(roles, Role(r))
+		}
+
+		rules[endpoint] = Rule{
+			AllowedRoles: roles,
+			IsPublic:     rule.Public,
+		}
 	}
 
-	claims, err := utils.VerifyToken(accessToken, []byte(s.jwtConfig.AccessTokenSecret()))
-	if err != nil {
-		return nil, errors.ErrInvalidToken
-	}
-
-	if ok := s.checker.HasAccess(Role(claims.Role), req.GetEndpointAddress()); ok {
-		return nil, nil
-	}
-
-	return nil, errors.ErrAccessDenied
+	return rules
 }

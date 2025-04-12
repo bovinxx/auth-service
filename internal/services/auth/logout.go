@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/bovinxx/auth-service/internal/logger"
+	"github.com/bovinxx/auth-service/internal/utils"
 )
 
 func (s *serv) Logout(ctx context.Context, refreshToken string) error {
-	cacheKey := newUserCacheKey(sessionCacheKeyPrefix, refreshToken)
+	cacheKey := utils.NewCacheKey(sessionCacheKeyPrefix, refreshToken)
 	err := s.cache.Del(ctx, cacheKey)
 	if err != nil {
 		logger.Warn("failed to delete session from cache", logger.Err(err))

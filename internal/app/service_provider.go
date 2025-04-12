@@ -14,8 +14,6 @@ import (
 	accessServiceImpl "github.com/bovinxx/auth-service/internal/services/access"
 	authServiceImpl "github.com/bovinxx/auth-service/internal/services/auth"
 	userServiceImpl "github.com/bovinxx/auth-service/internal/services/user"
-	desc "github.com/bovinxx/auth-service/pkg/access_v1"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type userService interface {
@@ -33,7 +31,7 @@ type authService interface {
 }
 
 type accessService interface {
-	Check(ctx context.Context, req *desc.CheckRequest) (*emptypb.Empty, error)
+	Check(ctx context.Context, endpoint string) (bool, error)
 }
 
 type userRepository interface {
@@ -61,6 +59,7 @@ type serviceProvider struct {
 	httpConfig       config.HTTPConfig
 	prometheusConfig config.PrometheusConfig
 	jwtConfig        config.JWTConfig
+	accessConfig     config.AccessConfig
 
 	userRepo    userRepository
 	sessionRepo sessionRepository
@@ -148,6 +147,19 @@ func (s *serviceProvider) JWTConfig() config.JWTConfig {
 	return s.jwtConfig
 }
 
+func (s *serviceProvider) AccessConfig() config.AccessConfig {
+	if s.accessConfig == nil {
+		cfg, err := config.NewAccessConfig()
+		if err != nil {
+			logger.Fatal("failed to create access config", logger.Err(err))
+		}
+
+		s.accessConfig = cfg
+	}
+
+	return s.accessConfig
+}
+
 func (s *serviceProvider) UserRepository(ctx context.Context) userRepository {
 	if s.userRepo == nil {
 		repo, err := userRepoImpl.NewRepository(s.DBProvider().DBClient(ctx))
@@ -204,6 +216,7 @@ func (s *serviceProvider) AccessService(ctx context.Context) accessService {
 			s.SessionRepository(ctx),
 			s.CacheProvider().RedisClient(ctx),
 			s.JWTConfig(),
+			s.AccessConfig(),
 		)
 		s.accessService = service
 	}
