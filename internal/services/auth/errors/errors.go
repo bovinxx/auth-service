@@ -8,4 +8,5 @@ var (
 	ErrSessionExpired     = errors.New("session is expired")
 	ErrInternal           = errors.New("internal error")
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrAccessDenied       = errors.New("access denied")
 )

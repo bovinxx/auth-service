@@ -2,8 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/bovinxx/auth-service/internal/models"
 	"github.com/bovinxx/auth-service/internal/utils"
@@ -20,37 +18,19 @@ func (s *serv) GetRefreshToken(
 		return nil, errors.Errorf("failed to get refresh token: %v", err)
 	}
 
-	username := claims.Username
-
 	err = s.checkRefreshToken(ctx, oldRefreshToken)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := utils.GenerateToken(
-		models.UserInfo{
-			UserID:   claims.UserID,
-			Username: username,
-			Role:     claims.Role,
-		},
-		[]byte(s.jwtConfig.RefreshTokenSecret()),
-		s.jwtConfig.RefreshTokenExpiration(),
-	)
+	refreshToken, err := s.createRefreshToken(claims.UserID, claims.Username, claims.Role)
 	if err != nil {
-		return nil, errors.Errorf("failed to create a new refresh token: %v", err)
+		return nil, err
 	}
 
-	session := &models.Session{
-		UserID:       claims.UserID,
-		RefreshToken: refreshToken,
-		CreatedAt:    time.Now(),
-		ExpiresAt:    time.Now().Add(s.jwtConfig.RefreshTokenExpiration()),
-		RevokedAt:    nil,
-	}
-
-	err = s.sessionRepo.CreateSession(ctx, session)
+	err = s.createSession(ctx, claims.UserID, refreshToken)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create a new session: %w", err)
+		return nil, err
 	}
 
 	return &models.Token{
