@@ -1,8 +1,0 @@
-{"level":"info","timestamp":"2025-04-12T14:20:07.134+0300","msg":"failed to create a new user","error":"failed to create a new user: failed to insert user: ERROR: relation \"users\" does not exist (SQLSTATE 42P01)"}
-{"level":"info","timestamp":"2025-04-12T14:20:36.174+0300","msg":"failed to create a new user","error":"failed to create a new user: failed to insert user: ERROR: column \"role\" of relation \"users\" does not exist (SQLSTATE 42703)"}
-{"level":"info","timestamp":"2025-04-12T14:21:20.667+0300","msg":"failed to create a new user","error":"failed to create a new user: failed to insert user: ERROR: column \"role\" of relation \"users\" does not exist (SQLSTATE 42703)"}
-{"level":"info","timestamp":"2025-04-12T14:35:12.229+0300","msg":"failed to create a new user","error":"failed to create a new user: failed to insert user: ERROR: duplicate key value violates unique constraint \"users_name_key\" (SQLSTATE 23505)"}
-{"level":"info","timestamp":"2025-04-12T14:36:19.438+0300","msg":"failed to get user","error":"failed to get user: failed to select user: no rows in result set"}
-{"level":"info","timestamp":"2025-04-12T14:36:29.288+0300","msg":"failed to get user","error":"failed to get user: failed to select user: no rows in result set"}
-{"level":"info","timestamp":"2025-04-12T14:36:42.719+0300","msg":"failed to get user","error":"failed to get user: failed to select user: no rows in result set"}
-{"level":"info","timestamp":"2025-04-12T14:37:01.744+0300","msg":"failed to get user","error":"failed to get user: failed to select user: no rows in result set"}

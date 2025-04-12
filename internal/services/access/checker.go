@@ -1,18 +1,12 @@
 package access
 
-import "sync"
+import (
+	"context"
+	"strings"
+	"sync"
 
-type Role string
-
-const (
-	RoleAdmin Role = "admin"
-	RoleUser  Role = "user"
+	serverrs "github.com/bovinxx/auth-service/internal/services/access/errors"
 )
-
-type Rule struct {
-	AllowedRoles []Role
-	IsPublic     bool
-}
 
 type Checker interface {
 	HasAccess(userRole Role, endpoint string) bool
@@ -50,4 +44,33 @@ func (c *StaticChecker) HasAccess(userRole Role, endpoint string) bool {
 	}
 
 	return false
+}
+
+func (s *serv) Check(ctx context.Context, endpoint string) (bool, error) {
+	endpoint = strings.ToLower(endpoint)
+
+	if s.isEndpointPublic(endpoint) {
+		return true, nil
+	}
+
+	accessToken, err := s.extractBearerToken(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	claims, err := s.verifyToken(accessToken)
+	if err != nil {
+		return false, err
+	}
+
+	if ok := s.checker.HasAccess(Role(claims.Role), endpoint); ok {
+		return false, nil
+	}
+
+	return true, serverrs.ErrAccessDenied
+}
+
+func (s *serv) isEndpointPublic(endpoint string) bool {
+	rule, ok := s.accessConfig.AccessRule()[endpoint]
+	return ok && rule.Public
 }

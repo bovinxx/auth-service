@@ -4,11 +4,10 @@ import (
 	"context"
 
 	desc "github.com/bovinxx/auth-service/pkg/access_v1"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type AccessService interface {
-	Check(ctx context.Context, req *desc.CheckRequest) (*emptypb.Empty, error)
+	Check(ctx context.Context, endpoint string) (bool, error)
 }
 
 type Implementation struct {

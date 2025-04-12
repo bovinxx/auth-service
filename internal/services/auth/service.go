@@ -53,13 +53,9 @@ func NewService(
 	}
 }
 
-func newUserCacheKey(prefix, username string) string {
-	return fmt.Sprintf("%s:%s", prefix, username)
-}
-
 func (s *serv) getUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	user := &models.User{}
-	cacheKey := newUserCacheKey(userCacheKeyPrefix, username)
+	cacheKey := utils.NewCacheKey(userCacheKeyPrefix, username)
 
 	err := s.cache.GetStruct(ctx, cacheKey, user)
 	if err != nil {
@@ -76,7 +72,7 @@ func (s *serv) getUserByUsername(ctx context.Context, username string) (*models.
 
 func (s *serv) getSessionByToken(ctx context.Context, refreshToken string) (*models.Session, error) {
 	session := &models.Session{}
-	cacheKey := newUserCacheKey(sessionCacheKeyPrefix, refreshToken)
+	cacheKey := utils.NewCacheKey(sessionCacheKeyPrefix, refreshToken)
 	err := s.cache.GetStruct(ctx, cacheKey, session)
 
 	if err != nil {
