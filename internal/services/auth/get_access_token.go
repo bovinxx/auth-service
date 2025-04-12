@@ -22,16 +22,9 @@ func (s *serv) GetAccessToken(
 		return nil, err
 	}
 
-	accessToken, err := utils.GenerateToken(
-		models.UserInfo{
-			Username: claims.Username,
-			Role:     claims.Role,
-		},
-		[]byte(s.jwtConfig.AccessTokenSecret()),
-		s.jwtConfig.AccessTokenExpiration(),
-	)
+	accessToken, err := s.createAccessToken(claims.UserID, claims.Username, claims.Role)
 	if err != nil {
-		return nil, errors.Errorf("failed to create a new access token: %v", err)
+		return nil, err
 	}
 
 	return &models.Token{
