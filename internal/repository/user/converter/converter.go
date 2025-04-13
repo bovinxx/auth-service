@@ -11,6 +11,6 @@ func ToUserFromRepo(user *model.User) *models.User {
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
-		Role:     user.Role,
+		Role:     models.Role(user.Role),
 	}
 }

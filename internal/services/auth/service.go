@@ -92,7 +92,7 @@ func (s *serv) getSessionByToken(ctx context.Context, refreshToken string) (*mod
 	return session, nil
 }
 
-func (s *serv) createRefreshToken(userID int64, username, role string) (string, error) {
+func (s *serv) createRefreshToken(userID int64, username string, role models.Role) (string, error) {
 	refreshToken, err := utils.GenerateToken(
 		models.UserInfo{
 			UserID:   userID,
@@ -109,7 +109,7 @@ func (s *serv) createRefreshToken(userID int64, username, role string) (string, 
 	return refreshToken, nil
 }
 
-func (s *serv) createAccessToken(userID int64, username, role string) (string, error) {
+func (s *serv) createAccessToken(userID int64, username string, role models.Role) (string, error) {
 	accessToken, err := utils.GenerateToken(
 		models.UserInfo{
 			UserID:   userID,

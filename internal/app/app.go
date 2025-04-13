@@ -125,6 +125,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 		grpc.ChainUnaryInterceptor(
 			interceptor.RateLimiterInterceptor,
 			interceptor.MetricsInterceptor,
+			interceptor.ValidateInterceptor,
 			interceptor.AuthzInterceptor(a.serviceProvider.AccessService(ctx))),
 	)
 

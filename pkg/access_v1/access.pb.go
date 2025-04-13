@@ -7,6 +7,7 @@
 package access_v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -70,7 +71,7 @@ var File_access_proto protoreflect.FileDescriptor
 
 const file_access_proto_rawDesc = "" +
 	"\n" +
-	"\faccess.proto\x12\x06access\x1a\x1bgoogle/protobuf/empty.proto\"9\n" +
+	"\faccess.proto\x12\x06access\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"9\n" +
 	"\fCheckRequest\x12)\n" +
 	"\x10endpoint_address\x18\x01 \x01(\tR\x0fendpointAddress2F\n" +
 	"\rAccessService\x125\n" +

@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/georgysavva/scany v1.2.3
 	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/golang-jwt/jwt/v4 v4.5.2
