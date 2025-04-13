@@ -7,6 +7,7 @@
 package user_v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -24,12 +25,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Role int32
+
+const (
+	Role_ROLE_ADMIN Role = 0
+	Role_ROLE_USER  Role = 1
+)
+
+// Enum value maps for Role.
+var (
+	Role_name = map[int32]string{
+		0: "ROLE_ADMIN",
+		1: "ROLE_USER",
+	}
+	Role_value = map[string]int32{
+		"ROLE_ADMIN": 0,
+		"ROLE_USER":  1,
+	}
+)
+
+func (x Role) Enum() *Role {
+	p := new(Role)
+	*p = x
+	return p
+}
+
+func (x Role) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Role) Descriptor() protoreflect.EnumDescriptor {
+	return file_user_proto_enumTypes[0].Descriptor()
+}
+
+func (Role) Type() protoreflect.EnumType {
+	return &file_user_proto_enumTypes[0]
+}
+
+func (x Role) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Role.Descriptor instead.
+func (Role) EnumDescriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{0}
+}
+
 type CreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	Role          string                 `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
+	Role          Role                   `protobuf:"varint,4,opt,name=role,proto3,enum=user.Role" json:"role,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -85,11 +132,11 @@ func (x *CreateRequest) GetPassword() string {
 	return ""
 }
 
-func (x *CreateRequest) GetRole() string {
+func (x *CreateRequest) GetRole() Role {
 	if x != nil {
 		return x.Role
 	}
-	return ""
+	return Role_ROLE_ADMIN
 }
 
 type CreateResponse struct {
@@ -185,7 +232,7 @@ type GetResponse struct {
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Role          string                 `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
+	Role          Role                   `protobuf:"varint,4,opt,name=role,proto3,enum=user.Role" json:"role,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -243,11 +290,11 @@ func (x *GetResponse) GetEmail() string {
 	return ""
 }
 
-func (x *GetResponse) GetRole() string {
+func (x *GetResponse) GetRole() Role {
 	if x != nil {
 		return x.Role
 	}
-	return ""
+	return Role_ROLE_ADMIN
 }
 
 func (x *GetResponse) GetCreatedAt() *timestamppb.Timestamp {
@@ -373,32 +420,38 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x04user\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\"i\n" +
-	"\rCreateRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x12\n" +
-	"\x04role\x18\x04 \x01(\tR\x04role\" \n" +
+	"user.proto\x12\x04user\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17validate/validate.proto\"\xaf\x01\n" +
+	"\rCreateRequest\x12.\n" +
+	"\x04name\x18\x01 \x01(\tB\x1a\xfaB\x17r\x15\x10\x01\x18 2\x0f^[a-zA-Z0-9_]+$R\x04name\x12\x1d\n" +
+	"\x05email\x18\x02 \x01(\tB\a\xfaB\x04r\x02`\x01R\x05email\x12%\n" +
+	"\bpassword\x18\x03 \x01(\tB\t\xfaB\x06r\x04\x10\x05\x18@R\bpassword\x12(\n" +
+	"\x04role\x18\x04 \x01(\x0e2\n" +
+	".user.RoleB\b\xfaB\x05\x82\x01\x02\x10\x01R\x04role\" \n" +
 	"\x0eCreateResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\x1c\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"%\n" +
 	"\n" +
-	"GetRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xd1\x01\n" +
+	"GetRequest\x12\x17\n" +
+	"\x02id\x18\x01 \x01(\x03B\a\xfaB\x04\"\x02(\x00R\x02id\"\xdd\x01\n" +
 	"\vGetResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\x12\x12\n" +
-	"\x04role\x18\x04 \x01(\tR\x04role\x129\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1e\n" +
+	"\x04role\x18\x04 \x01(\x0e2\n" +
+	".user.RoleR\x04role\x129\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"e\n" +
-	"\rUpdateRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12!\n" +
-	"\fold_password\x18\x03 \x01(\tR\voldPassword\x12!\n" +
-	"\fnew_password\x18\x04 \x01(\tR\vnewPassword\"\x1f\n" +
-	"\rDeleteRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id2\xe3\x02\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x84\x01\n" +
+	"\rUpdateRequest\x12\x17\n" +
+	"\x02id\x18\x01 \x01(\x03B\a\xfaB\x04\"\x02(\x00R\x02id\x12,\n" +
+	"\fold_password\x18\x03 \x01(\tB\t\xfaB\x06r\x04\x10\x05\x18@R\voldPassword\x12,\n" +
+	"\fnew_password\x18\x04 \x01(\tB\t\xfaB\x06r\x04\x10\x05\x18@R\vnewPassword\"(\n" +
+	"\rDeleteRequest\x12\x17\n" +
+	"\x02id\x18\x01 \x01(\x03B\a\xfaB\x04\"\x02(\x00R\x02id*%\n" +
+	"\x04Role\x12\x0e\n" +
+	"\n" +
+	"ROLE_ADMIN\x10\x00\x12\r\n" +
+	"\tROLE_USER\x10\x012\xe3\x02\n" +
 	"\vUserService\x12W\n" +
 	"\x06Create\x12\x13.user.CreateRequest\x1a\x14.user.CreateResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/auth-service/v1/create\x12H\n" +
 	"\x03Get\x12\x10.user.GetRequest\x1a\x11.user.GetResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/auth-service/v1/get\x12Y\n" +
@@ -417,33 +470,37 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
+var file_user_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_user_proto_goTypes = []any{
-	(*CreateRequest)(nil),         // 0: user.CreateRequest
-	(*CreateResponse)(nil),        // 1: user.CreateResponse
-	(*GetRequest)(nil),            // 2: user.GetRequest
-	(*GetResponse)(nil),           // 3: user.GetResponse
-	(*UpdateRequest)(nil),         // 4: user.UpdateRequest
-	(*DeleteRequest)(nil),         // 5: user.DeleteRequest
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 7: google.protobuf.Empty
+	(Role)(0),                     // 0: user.Role
+	(*CreateRequest)(nil),         // 1: user.CreateRequest
+	(*CreateResponse)(nil),        // 2: user.CreateResponse
+	(*GetRequest)(nil),            // 3: user.GetRequest
+	(*GetResponse)(nil),           // 4: user.GetResponse
+	(*UpdateRequest)(nil),         // 5: user.UpdateRequest
+	(*DeleteRequest)(nil),         // 6: user.DeleteRequest
+	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 8: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
-	6, // 0: user.GetResponse.created_at:type_name -> google.protobuf.Timestamp
-	6, // 1: user.GetResponse.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: user.UserService.Create:input_type -> user.CreateRequest
-	2, // 3: user.UserService.Get:input_type -> user.GetRequest
-	4, // 4: user.UserService.Update:input_type -> user.UpdateRequest
-	5, // 5: user.UserService.Delete:input_type -> user.DeleteRequest
-	1, // 6: user.UserService.Create:output_type -> user.CreateResponse
-	3, // 7: user.UserService.Get:output_type -> user.GetResponse
-	7, // 8: user.UserService.Update:output_type -> google.protobuf.Empty
-	7, // 9: user.UserService.Delete:output_type -> google.protobuf.Empty
-	6, // [6:10] is the sub-list for method output_type
-	2, // [2:6] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // 0: user.CreateRequest.role:type_name -> user.Role
+	0, // 1: user.GetResponse.role:type_name -> user.Role
+	7, // 2: user.GetResponse.created_at:type_name -> google.protobuf.Timestamp
+	7, // 3: user.GetResponse.updated_at:type_name -> google.protobuf.Timestamp
+	1, // 4: user.UserService.Create:input_type -> user.CreateRequest
+	3, // 5: user.UserService.Get:input_type -> user.GetRequest
+	5, // 6: user.UserService.Update:input_type -> user.UpdateRequest
+	6, // 7: user.UserService.Delete:input_type -> user.DeleteRequest
+	2, // 8: user.UserService.Create:output_type -> user.CreateResponse
+	4, // 9: user.UserService.Get:output_type -> user.GetResponse
+	8, // 10: user.UserService.Update:output_type -> google.protobuf.Empty
+	8, // 11: user.UserService.Delete:output_type -> google.protobuf.Empty
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -456,13 +513,14 @@ func file_user_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_user_proto_goTypes,
 		DependencyIndexes: file_user_proto_depIdxs,
+		EnumInfos:         file_user_proto_enumTypes,
 		MessageInfos:      file_user_proto_msgTypes,
 	}.Build()
 	File_user_proto = out.File

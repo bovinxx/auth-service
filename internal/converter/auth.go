@@ -6,10 +6,11 @@ import (
 )
 
 func ToServiceFromLoginRequest(user *desc.LoginRequest) *models.User {
+	role := int32(user.GetRole())
 	return &models.User{
 		Name:     user.GetUsername(),
 		Password: user.GetPassword(),
-		Role:     user.GetRole(),
+		Role:     models.Role(role),
 	}
 }
 

@@ -10,7 +10,7 @@ func ToCreateRequestFromRepo(user *models.User) *desc.CreateRequest {
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
-		Role:     user.Role,
+		Role:     desc.Role(int32(user.Role)),
 	}
 }
 
@@ -19,15 +19,16 @@ func ToGetResponseFromUser(user *models.User) *desc.GetResponse {
 		Id:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  user.Role,
+		Role:  desc.Role(int32(user.Role)),
 	}
 }
 
 func ToUserFromCreateRequest(req *desc.CreateRequest) *models.User {
+	role := int32(req.GetRole())
 	return &models.User{
 		Name:     req.GetName(),
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
-		Role:     req.GetRole(),
+		Role:     models.Role(role),
 	}
 }

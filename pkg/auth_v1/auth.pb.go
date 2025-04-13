@@ -7,6 +7,7 @@
 package auth_v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -22,11 +23,57 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Role int32
+
+const (
+	Role_ROLE_ADMIN Role = 0
+	Role_ROLE_USER  Role = 1
+)
+
+// Enum value maps for Role.
+var (
+	Role_name = map[int32]string{
+		0: "ROLE_ADMIN",
+		1: "ROLE_USER",
+	}
+	Role_value = map[string]int32{
+		"ROLE_ADMIN": 0,
+		"ROLE_USER":  1,
+	}
+)
+
+func (x Role) Enum() *Role {
+	p := new(Role)
+	*p = x
+	return p
+}
+
+func (x Role) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Role) Descriptor() protoreflect.EnumDescriptor {
+	return file_auth_proto_enumTypes[0].Descriptor()
+}
+
+func (Role) Type() protoreflect.EnumType {
+	return &file_auth_proto_enumTypes[0]
+}
+
+func (x Role) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Role.Descriptor instead.
+func (Role) EnumDescriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{0}
+}
+
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	Role          Role                   `protobuf:"varint,3,opt,name=role,proto3,enum=auth.Role" json:"role,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,11 +122,11 @@ func (x *LoginRequest) GetPassword() string {
 	return ""
 }
 
-func (x *LoginRequest) GetRole() string {
+func (x *LoginRequest) GetRole() Role {
 	if x != nil {
 		return x.Role
 	}
-	return ""
+	return Role_ROLE_ADMIN
 }
 
 type LoginResponse struct {
@@ -351,11 +398,12 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\x04auth\x1a\x1bgoogle/protobuf/empty.proto\"Z\n" +
-	"\fLoginRequest\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
-	"\x04role\x18\x03 \x01(\tR\x04role\"4\n" +
+	"auth.proto\x12\x04auth\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"\x97\x01\n" +
+	"\fLoginRequest\x126\n" +
+	"\busername\x18\x01 \x01(\tB\x1a\xfaB\x17r\x15\x10\x01\x18 2\x0f^[a-zA-Z0-9_]+$R\busername\x12%\n" +
+	"\bpassword\x18\x02 \x01(\tB\t\xfaB\x06r\x04\x10\x05\x18@R\bpassword\x12(\n" +
+	"\x04role\x18\x03 \x01(\x0e2\n" +
+	".auth.RoleB\b\xfaB\x05\x82\x01\x02\x10\x01R\x04role\"4\n" +
 	"\rLoginResponse\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"4\n" +
 	"\rLogoutRequest\x12#\n" +
@@ -367,7 +415,11 @@ const file_auth_proto_rawDesc = "" +
 	"\x15GetAccessTokenRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\";\n" +
 	"\x16GetAccessTokenResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken2\x93\x02\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken*%\n" +
+	"\x04Role\x12\x0e\n" +
+	"\n" +
+	"ROLE_ADMIN\x10\x00\x12\r\n" +
+	"\tROLE_USER\x10\x012\x93\x02\n" +
 	"\vAuthService\x120\n" +
 	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x125\n" +
 	"\x06Logout\x12\x13.auth.LogoutRequest\x1a\x16.google.protobuf.Empty\x12N\n" +
@@ -386,31 +438,34 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
+var file_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_auth_proto_goTypes = []any{
-	(*LoginRequest)(nil),            // 0: auth.LoginRequest
-	(*LoginResponse)(nil),           // 1: auth.LoginResponse
-	(*LogoutRequest)(nil),           // 2: auth.LogoutRequest
-	(*GetRefreshTokenRequest)(nil),  // 3: auth.GetRefreshTokenRequest
-	(*GetRefreshTokenResponse)(nil), // 4: auth.GetRefreshTokenResponse
-	(*GetAccessTokenRequest)(nil),   // 5: auth.GetAccessTokenRequest
-	(*GetAccessTokenResponse)(nil),  // 6: auth.GetAccessTokenResponse
-	(*emptypb.Empty)(nil),           // 7: google.protobuf.Empty
+	(Role)(0),                       // 0: auth.Role
+	(*LoginRequest)(nil),            // 1: auth.LoginRequest
+	(*LoginResponse)(nil),           // 2: auth.LoginResponse
+	(*LogoutRequest)(nil),           // 3: auth.LogoutRequest
+	(*GetRefreshTokenRequest)(nil),  // 4: auth.GetRefreshTokenRequest
+	(*GetRefreshTokenResponse)(nil), // 5: auth.GetRefreshTokenResponse
+	(*GetAccessTokenRequest)(nil),   // 6: auth.GetAccessTokenRequest
+	(*GetAccessTokenResponse)(nil),  // 7: auth.GetAccessTokenResponse
+	(*emptypb.Empty)(nil),           // 8: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
-	0, // 0: auth.AuthService.Login:input_type -> auth.LoginRequest
-	2, // 1: auth.AuthService.Logout:input_type -> auth.LogoutRequest
-	3, // 2: auth.AuthService.GetRefreshToken:input_type -> auth.GetRefreshTokenRequest
-	5, // 3: auth.AuthService.GetAccessToken:input_type -> auth.GetAccessTokenRequest
-	1, // 4: auth.AuthService.Login:output_type -> auth.LoginResponse
-	7, // 5: auth.AuthService.Logout:output_type -> google.protobuf.Empty
-	4, // 6: auth.AuthService.GetRefreshToken:output_type -> auth.GetRefreshTokenResponse
-	6, // 7: auth.AuthService.GetAccessToken:output_type -> auth.GetAccessTokenResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: auth.LoginRequest.role:type_name -> auth.Role
+	1, // 1: auth.AuthService.Login:input_type -> auth.LoginRequest
+	3, // 2: auth.AuthService.Logout:input_type -> auth.LogoutRequest
+	4, // 3: auth.AuthService.GetRefreshToken:input_type -> auth.GetRefreshTokenRequest
+	6, // 4: auth.AuthService.GetAccessToken:input_type -> auth.GetAccessTokenRequest
+	2, // 5: auth.AuthService.Login:output_type -> auth.LoginResponse
+	8, // 6: auth.AuthService.Logout:output_type -> google.protobuf.Empty
+	5, // 7: auth.AuthService.GetRefreshToken:output_type -> auth.GetRefreshTokenResponse
+	7, // 8: auth.AuthService.GetAccessToken:output_type -> auth.GetAccessTokenResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_auth_proto_init() }
@@ -423,13 +478,14 @@ func file_auth_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_auth_proto_goTypes,
 		DependencyIndexes: file_auth_proto_depIdxs,
+		EnumInfos:         file_auth_proto_enumTypes,
 		MessageInfos:      file_auth_proto_msgTypes,
 	}.Build()
 	File_auth_proto = out.File

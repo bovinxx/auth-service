@@ -1,6 +1,6 @@
 FROM golang:1.20.3-alpine as builder
 
-COPY . /github.com/bovinxx/auth-service/source
+COPY ../.. /github.com/bovinxx/auth-service/source
 WORKDIR /github.com/bovinxx/auth-service/source
 
 RUN go mod download
