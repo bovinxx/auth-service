@@ -7,6 +7,8 @@ import (
 	desc "github.com/bovinxx/auth-service/pkg/auth_v1"
 )
 
+//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
+
 type AuthService interface {
 	Login(ctx context.Context, req *models.User) (string, error)
 	Logout(ctx context.Context, refreshToken string) error
