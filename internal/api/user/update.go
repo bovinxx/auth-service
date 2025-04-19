@@ -23,7 +23,8 @@ func (s *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*
 		logger.Info("failed to update user", logger.Err(err))
 		if errors.Is(err, serviceerrs.ErrUserNotExists) {
 			return nil, status.Errorf(codes.NotFound, "user not exist")
-		} else if errors.Is(err, serviceerrs.ErrInvalidCredentials) {
+		}
+		if errors.Is(err, serviceerrs.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid credentials")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update user: %v", err)

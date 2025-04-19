@@ -5,22 +5,17 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"sync"
 
 	"github.com/bovinxx/auth-service/internal/closer"
 	"github.com/bovinxx/auth-service/internal/config"
 	"github.com/bovinxx/auth-service/internal/interceptor"
-	"github.com/bovinxx/auth-service/internal/logger"
 	"github.com/bovinxx/auth-service/internal/metrics"
 	descAccess "github.com/bovinxx/auth-service/pkg/access_v1"
 	descAuth "github.com/bovinxx/auth-service/pkg/auth_v1"
 	descUser "github.com/bovinxx/auth-service/pkg/user_v1"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/natefinch/lumberjack"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -33,7 +28,6 @@ type App struct {
 }
 
 func NewApp(ctx context.Context) (*App, error) {
-	logger.Init(getCore(getAtomicLevel()))
 	a := &App{}
 
 	if err := a.initDeps(ctx); err != nil {
@@ -202,39 +196,4 @@ func (a *App) runHTTPServer() error {
 	}
 
 	return nil
-}
-
-func getCore(level zap.AtomicLevel) zapcore.Core {
-	stdout := zapcore.AddSync(os.Stdout)
-
-	file := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "logs/app.log",
-		MaxSize:    10, // megabytes
-		MaxBackups: 3,
-		MaxAge:     7, // days
-	})
-
-	productionCfg := zap.NewProductionEncoderConfig()
-	productionCfg.TimeKey = "timestamp"
-	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	developmentCfg := zap.NewDevelopmentEncoderConfig()
-	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
-
-	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
-	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
-
-	return zapcore.NewTee(
-		zapcore.NewCore(consoleEncoder, stdout, level),
-		zapcore.NewCore(fileEncoder, file, level),
-	)
-}
-
-func getAtomicLevel() zap.AtomicLevel {
-	var level zapcore.Level
-	if err := level.Set("info"); err != nil {
-		log.Fatalf("failed to set log level: %v", err)
-	}
-
-	return zap.NewAtomicLevelAt(level)
 }

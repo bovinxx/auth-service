@@ -5,6 +5,7 @@ import (
 	"flag"
 
 	"github.com/bovinxx/auth-service/internal/app"
+	"github.com/bovinxx/auth-service/internal/logger"
 )
 
 var configPath string
@@ -14,6 +15,8 @@ func init() {
 }
 
 func main() {
+	logger.InitDefaulLogger()
+
 	flag.Parse()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
