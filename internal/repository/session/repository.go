@@ -85,10 +85,6 @@ func (r *repo) GetSession(ctx context.Context, id int64) (*models.Session, error
 	return converter.ToSessionFromRepo(session), nil
 }
 
-func (r *repo) GetAllUserSessions(ctx context.Context, username string) ([]*models.Session, error) {
-	return nil, nil
-}
-
 func (r *repo) GetSessionByToken(ctx context.Context, token string) (*models.Session, error) {
 	builderSelect := sq.Select(userIDColumn, refreshTokenColumn, createdAtColumn, expiresAtColumn, revokedAtColumn).
 		From(tableName).

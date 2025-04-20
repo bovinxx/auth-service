@@ -7,9 +7,9 @@ import (
 	desc "github.com/bovinxx/auth-service/pkg/user_v1"
 )
 
-//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
+// go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
 
-type UserService interface {
+type service interface {
 	CreateUser(ctx context.Context, user *models.User) (int64, error)
 	GetUser(ctx context.Context, id int64) (*models.User, error)
 	UpdateUser(ctx context.Context, id int64, oldPassword, newPassword string) error
@@ -18,10 +18,10 @@ type UserService interface {
 
 type Implementation struct {
 	desc.UnimplementedUserServiceServer
-	service UserService
+	service service
 }
 
-func NewImplementation(service UserService) *Implementation {
+func NewImplementation(service service) *Implementation {
 	return &Implementation{
 		service: service,
 	}

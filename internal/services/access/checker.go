@@ -5,11 +5,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/bovinxx/auth-service/internal/models"
 	serverrs "github.com/bovinxx/auth-service/internal/services/access/errors"
 )
 
 type Checker interface {
-	HasAccess(userRole Role, endpoint string) bool
+	HasAccess(userRole models.Role, endpoint string) bool
 }
 
 type StaticChecker struct {
@@ -24,7 +25,7 @@ func NewStaticChecker(rules map[string]Rule) Checker {
 	}
 }
 
-func (c *StaticChecker) HasAccess(userRole Role, endpoint string) bool {
+func (c *StaticChecker) HasAccess(userRole models.Role, endpoint string) bool {
 	c.accessRulesMu.Lock()
 	defer c.accessRulesMu.Unlock()
 
@@ -46,7 +47,7 @@ func (c *StaticChecker) HasAccess(userRole Role, endpoint string) bool {
 	return false
 }
 
-func (s *serv) Check(ctx context.Context, endpoint string) (bool, error) {
+func (s *Serv) Check(ctx context.Context, endpoint string) (bool, error) {
 	endpoint = strings.ToLower(endpoint)
 
 	if s.isEndpointPublic(endpoint) {
@@ -63,14 +64,14 @@ func (s *serv) Check(ctx context.Context, endpoint string) (bool, error) {
 		return false, err
 	}
 
-	if ok := s.checker.HasAccess(Role(claims.Role), endpoint); ok {
+	if ok := s.checker.HasAccess(models.Role(claims.Role), endpoint); ok {
 		return false, nil
 	}
 
 	return true, serverrs.ErrAccessDenied
 }
 
-func (s *serv) isEndpointPublic(endpoint string) bool {
+func (s *Serv) isEndpointPublic(endpoint string) bool {
 	rule, ok := s.accessConfig.AccessRule()[endpoint]
 	return ok && rule.Public
 }

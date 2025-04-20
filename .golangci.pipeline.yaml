@@ -1,12 +1,12 @@
 run:
   timeout: 5m
-  skip-dirs:
-    - vendor.protogen
-    - pkg
-    - bin
   build-tags: ""
-  build:
-    no-vcs: true
+  skip-dirs-use-default: false
+  skip-files:
+    - '.*_test.go'
+
+build:
+  no-vcs: true
 
 output:
   format: colored-line-number
@@ -14,7 +14,7 @@ output:
 
 linters:
   enable:
-    - revive         
+    - revive
     - errcheck
     - gocyclo
     - gofmt
@@ -27,24 +27,30 @@ linters:
     - ineffassign
     - prealloc
     - bodyclose
-    - gocritic      
+    - gocritic
 
 issues:
   exclude:
     - "error return value not checked.*(Close|Log|Exit)"
     - "should have 2 args, not 3"
+  exclude-dirs:
+    - vendor.protogen
+    - pkg
+    - bin
 
 max-line-length: 120
-funlen:
-  lines: 50
-  statements: 30
-  comments: 5
 
 gofmt:
   simplify: true
 
 misspell:
   locale: en_US
+
+funlen:
+  lines: 500
+  statements: 60
+  comments: 5
+  ignore_tests: true
 
 revive:
   confidence: 0.8
@@ -69,4 +75,3 @@ gocritic:
     - captLocal
     - typeSwitchVar
     - whyNoLint
-

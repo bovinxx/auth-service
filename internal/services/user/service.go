@@ -3,11 +3,10 @@ package user
 import (
 	"context"
 
-	"github.com/bovinxx/auth-service/internal/client/db"
 	"github.com/bovinxx/auth-service/internal/models"
 )
 
-//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
+// go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
 
 type userRepository interface {
 	CreateUser(ctx context.Context, user *models.User) (int64, error)
@@ -17,13 +16,12 @@ type userRepository interface {
 	DeleteUser(ctx context.Context, id int64) error
 }
 
-type serv struct {
-	repo      userRepository
-	txManager db.TxManager
+type Serv struct {
+	repo userRepository
 }
 
-func NewService(repo userRepository) *serv {
-	return &serv{
+func NewService(repo userRepository) *Serv {
+	return &Serv{
 		repo: repo,
 	}
 }

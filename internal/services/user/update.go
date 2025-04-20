@@ -10,7 +10,7 @@ import (
 	"github.com/bovinxx/auth-service/internal/utils"
 )
 
-func (s *serv) UpdateUser(ctx context.Context, id int64, oldPassword, newPassword string) error {
+func (s *Serv) UpdateUser(ctx context.Context, id int64, oldPassword, newPassword string) error {
 	user, err := s.GetUser(ctx, id)
 	if err != nil {
 		if errors.Is(err, repoerrs.ErrUserNotExists) {

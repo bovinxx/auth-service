@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func AuthzInterceptor(accessSvc access.AccessService) grpc.UnaryServerInterceptor {
+func AuthzInterceptor(accessSvc access.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context,
 		req interface{},
 		info *grpc.UnaryServerInfo,

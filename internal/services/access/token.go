@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func (s *serv) extractBearerToken(ctx context.Context) (string, error) {
+func (s *Serv) extractBearerToken(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", errors.ErrNoMetadata
@@ -30,7 +30,7 @@ func (s *serv) extractBearerToken(ctx context.Context) (string, error) {
 	return accessToken, nil
 }
 
-func (s *serv) verifyToken(accessToken string) (*models.UserClaims, error) {
+func (s *Serv) verifyToken(accessToken string) (*models.UserClaims, error) {
 	claims, err := utils.VerifyToken(accessToken, []byte(s.jwtConfig.AccessTokenSecret()))
 	if err != nil {
 		return nil, errors.ErrInvalidToken

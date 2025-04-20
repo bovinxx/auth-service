@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	"github.com/bovinxx/auth-service/internal/models"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
 )
@@ -12,8 +13,8 @@ type AccessConfig interface {
 }
 
 type AccessRuleConfig struct {
-	Role   []string `mapstructure:"roles"`
-	Public bool     `mapstructure:"public"`
+	Role   []models.Role `mapstructure:"roles"`
+	Public bool          `mapstructure:"public"`
 }
 
 type config struct {

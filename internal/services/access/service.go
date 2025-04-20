@@ -9,19 +9,17 @@ import (
 	"github.com/bovinxx/auth-service/internal/models"
 )
 
-type Role string
-
 type Rule struct {
-	AllowedRoles []Role
+	AllowedRoles []models.Role
 	IsPublic     bool
 }
 
 const (
-	RoleAdmin             Role = "admin"
-	RoleUser              Role = "user"
-	authPrefix                 = "Bearer: "
-	sessionCacheKeyPrefix      = "auth:session:sessionID"
-	cacheExpTime               = 10 * time.Minute
+	RoleAdmin             models.Role = models.RoleAdmin
+	RoleUser              models.Role = models.RoleUser
+	authPrefix                        = "Bearer: "
+	sessionCacheKeyPrefix             = "auth:session:sessionID"
+	cacheExpTime                      = 10 * time.Minute
 )
 
 type userRepository interface {
@@ -34,7 +32,7 @@ type sessionRepository interface {
 	GetSessionByToken(ctx context.Context, token string) (*models.Session, error)
 }
 
-type serv struct {
+type Serv struct {
 	userRepo     userRepository
 	sessionRepo  sessionRepository
 	cache        cache.RedisClient
@@ -48,8 +46,8 @@ func NewService(
 	sessionRepo sessionRepository,
 	cache cache.RedisClient,
 	jwtConfig config.JWTConfig,
-	accessConfig config.AccessConfig) *serv {
-	return &serv{
+	accessConfig config.AccessConfig) *Serv {
+	return &Serv{
 		userRepo:     repo,
 		sessionRepo:  sessionRepo,
 		cache:        cache,
@@ -63,9 +61,9 @@ func buildRulesFromConfig(cfg map[string]config.AccessRuleConfig) map[string]Rul
 	rules := make(map[string]Rule)
 
 	for endpoint, rule := range cfg {
-		roles := make([]Role, 0, len(rule.Role))
+		roles := make([]models.Role, 0, len(rule.Role))
 		for _, r := range rule.Role {
-			roles = append(roles, Role(r))
+			roles = append(roles, models.Role(r))
 		}
 
 		rules[endpoint] = Rule{
