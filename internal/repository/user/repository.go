@@ -10,6 +10,7 @@ import (
 	"github.com/bovinxx/auth-service/internal/repository/user/converter"
 	"github.com/bovinxx/auth-service/internal/repository/user/errors"
 	"github.com/bovinxx/auth-service/internal/repository/user/model"
+	"github.com/bovinxx/auth-service/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,7 +39,7 @@ func (r *repo) CreateUser(ctx context.Context, user *models.User) (int64, error)
 		return 0, errors.ErrUserAlreadyExists
 	}
 
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return 0, fmt.Errorf("failed to hash password: %v", err)
 	}

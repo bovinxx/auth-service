@@ -188,7 +188,7 @@ func (s *serviceProvider) SessionRepository(ctx context.Context) sessionReposito
 
 func (s *serviceProvider) UserService(ctx context.Context) userService {
 	if s.userService == nil {
-		service := userServiceImpl.NewService(s.UserRepository(ctx), s.dbProvider.TxManager(ctx))
+		service := userServiceImpl.NewService(s.UserRepository(ctx))
 		s.userService = service
 	}
 
