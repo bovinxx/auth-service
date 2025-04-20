@@ -33,7 +33,7 @@ type sessionRepository interface {
 	MarkSessionAsRevoked(ctx context.Context, refreshToken string) error
 }
 
-type serv struct {
+type Serv struct {
 	userRepo    userRepository
 	sessionRepo sessionRepository
 	cache       cache.RedisClient
@@ -44,8 +44,8 @@ func NewService(
 	userRepo userRepository,
 	sessionRepo sessionRepository,
 	cache cache.RedisClient,
-	jwtConfig config.JWTConfig) *serv {
-	return &serv{
+	jwtConfig config.JWTConfig) *Serv {
+	return &Serv{
 		userRepo:    userRepo,
 		sessionRepo: sessionRepo,
 		cache:       cache,
@@ -53,7 +53,7 @@ func NewService(
 	}
 }
 
-func (s *serv) getUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (s *Serv) getUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	user := &models.User{}
 	cacheKey := utils.NewCacheKey(userCacheKeyPrefix, username)
 
@@ -70,7 +70,7 @@ func (s *serv) getUserByUsername(ctx context.Context, username string) (*models.
 	return user, nil
 }
 
-func (s *serv) getSessionByToken(ctx context.Context, refreshToken string) (*models.Session, error) {
+func (s *Serv) getSessionByToken(ctx context.Context, refreshToken string) (*models.Session, error) {
 	session := &models.Session{}
 	cacheKey := utils.NewCacheKey(sessionCacheKeyPrefix, refreshToken)
 	err := s.cache.GetStruct(ctx, cacheKey, session)
@@ -92,7 +92,7 @@ func (s *serv) getSessionByToken(ctx context.Context, refreshToken string) (*mod
 	return session, nil
 }
 
-func (s *serv) createRefreshToken(userID int64, username string, role models.Role) (string, error) {
+func (s *Serv) createRefreshToken(userID int64, username string, role models.Role) (string, error) {
 	refreshToken, err := utils.GenerateToken(
 		models.UserInfo{
 			UserID:   userID,
@@ -109,7 +109,7 @@ func (s *serv) createRefreshToken(userID int64, username string, role models.Rol
 	return refreshToken, nil
 }
 
-func (s *serv) createAccessToken(userID int64, username string, role models.Role) (string, error) {
+func (s *Serv) createAccessToken(userID int64, username string, role models.Role) (string, error) {
 	accessToken, err := utils.GenerateToken(
 		models.UserInfo{
 			UserID:   userID,
@@ -126,7 +126,7 @@ func (s *serv) createAccessToken(userID int64, username string, role models.Role
 	return accessToken, nil
 }
 
-func (s *serv) createSession(ctx context.Context, userID int64, refreshToken string) error {
+func (s *Serv) createSession(ctx context.Context, userID int64, refreshToken string) error {
 	now := time.Now()
 	session := &models.Session{
 		UserID:       userID,

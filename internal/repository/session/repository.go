@@ -24,17 +24,17 @@ const (
 	revokedAtColumn    = "revoked_at"
 )
 
-type repo struct {
+type Repo struct {
 	db db.Client
 }
 
-func NewRepository(db db.Client) (*repo, error) {
-	return &repo{
+func NewRepository(db db.Client) (*Repo, error) {
+	return &Repo{
 		db: db,
 	}, nil
 }
 
-func (r *repo) CreateSession(ctx context.Context, session *models.Session) error {
+func (r *Repo) CreateSession(ctx context.Context, session *models.Session) error {
 	builderInsert := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Columns(userIDColumn, refreshTokenColumn, createdAtColumn, expiresAtColumn, revokedAtColumn).
@@ -60,7 +60,7 @@ func (r *repo) CreateSession(ctx context.Context, session *models.Session) error
 	return nil
 }
 
-func (r *repo) GetSession(ctx context.Context, id int64) (*models.Session, error) {
+func (r *Repo) GetSession(ctx context.Context, id int64) (*models.Session, error) {
 	builderSelect := sq.Select(userIDColumn, refreshTokenColumn, createdAtColumn, expiresAtColumn, revokedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -85,7 +85,7 @@ func (r *repo) GetSession(ctx context.Context, id int64) (*models.Session, error
 	return converter.ToSessionFromRepo(session), nil
 }
 
-func (r *repo) GetSessionByToken(ctx context.Context, token string) (*models.Session, error) {
+func (r *Repo) GetSessionByToken(ctx context.Context, token string) (*models.Session, error) {
 	builderSelect := sq.Select(userIDColumn, refreshTokenColumn, createdAtColumn, expiresAtColumn, revokedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -110,7 +110,7 @@ func (r *repo) GetSessionByToken(ctx context.Context, token string) (*models.Ses
 	return converter.ToSessionFromRepo(session), nil
 }
 
-func (r *repo) DeleteSession(ctx context.Context, refreshToken string) error {
+func (r *Repo) DeleteSession(ctx context.Context, refreshToken string) error {
 	deleteBuilder := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{refreshTokenColumn: refreshToken})
@@ -138,7 +138,7 @@ func (r *repo) DeleteSession(ctx context.Context, refreshToken string) error {
 	return nil
 }
 
-func (r *repo) MarkSessionAsRevoked(ctx context.Context, refreshToken string) error {
+func (r *Repo) MarkSessionAsRevoked(ctx context.Context, refreshToken string) error {
 	now := time.Now()
 	updateBuilder := sq.Update(tableName).
 		PlaceholderFormat(sq.Dollar).

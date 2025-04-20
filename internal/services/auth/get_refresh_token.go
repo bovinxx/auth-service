@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *serv) GetRefreshToken(
+func (s *Serv) GetRefreshToken(
 	ctx context.Context,
 	token *models.Token,
 ) (*models.Token, error) {

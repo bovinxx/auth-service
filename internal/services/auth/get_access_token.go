@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *serv) GetAccessToken(
+func (s *Serv) GetAccessToken(
 	ctx context.Context,
 	token *models.Token,
 ) (*models.Token, error) {

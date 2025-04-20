@@ -7,7 +7,7 @@ import (
 	serverrs "github.com/bovinxx/auth-service/internal/services/auth/errors"
 )
 
-func (s *serv) checkRefreshToken(ctx context.Context, refreshToken string) error {
+func (s *Serv) checkRefreshToken(ctx context.Context, refreshToken string) error {
 	session, err := s.getSessionByToken(ctx, refreshToken)
 	if err != nil {
 		return err
