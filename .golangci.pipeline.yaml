@@ -6,7 +6,7 @@ run:
     - bin
   build-tags: ""
   build:
-    no-vcs: true  # Отключить VCS check
+    no-vcs: true
 
 output:
   format: colored-line-number
@@ -14,7 +14,7 @@ output:
 
 linters:
   enable:
-    - revive         # Современная замена golint
+    - revive         
     - errcheck
     - gocyclo
     - gofmt
@@ -27,7 +27,7 @@ linters:
     - ineffassign
     - prealloc
     - bodyclose
-    - gocritic       # Для архитектурных проблем (оставляем включенным)
+    - gocritic      
 
 issues:
   exclude:
