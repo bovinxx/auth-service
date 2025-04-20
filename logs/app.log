@@ -1,0 +1,3 @@
+{"level":"fatal","timestamp":"2025-04-20T17:25:04.111+0300","msg":"failed to create jwt config","error":"access secret not found"}
+{"level":"fatal","timestamp":"2025-04-20T17:27:36.626+0300","msg":"failed to create access config","error":"failed to parse access config"}
+{"level":"info","timestamp":"2025-04-20T17:55:40.404+0300","msg":"failed to create a new user","error":"such user already exists"}

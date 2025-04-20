@@ -10,6 +10,7 @@ import (
 	"github.com/bovinxx/auth-service/internal/closer"
 	"github.com/bovinxx/auth-service/internal/config"
 	"github.com/bovinxx/auth-service/internal/interceptor"
+	"github.com/bovinxx/auth-service/internal/logger"
 	"github.com/bovinxx/auth-service/internal/metrics"
 	descAccess "github.com/bovinxx/auth-service/pkg/access_v1"
 	descAuth "github.com/bovinxx/auth-service/pkg/auth_v1"
@@ -56,7 +57,7 @@ func (a *App) Start(ctx context.Context) error {
 
 		err := a.runGRPCServer()
 		if err != nil {
-			log.Fatalf("failed to run GRPC server: %v", err)
+			logger.Fatal("failed to run GRPC server", logger.Err(err))
 		}
 	}()
 
@@ -65,7 +66,7 @@ func (a *App) Start(ctx context.Context) error {
 
 		err := a.runHTTPServer()
 		if err != nil {
-			log.Fatalf("failed to run HTTP server: %v", err)
+			logger.Fatal("failed to run HTTP server", logger.Err(err))
 		}
 	}()
 
@@ -74,7 +75,7 @@ func (a *App) Start(ctx context.Context) error {
 
 		err := a.runPrometheusHTTPServer()
 		if err != nil {
-			log.Fatalf("failed to run Prometheus HTTP server: %v", err)
+			logger.Fatal("failed to run Prometheus HTTP server", logger.Err(err))
 		}
 	}()
 

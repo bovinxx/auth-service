@@ -61,8 +61,8 @@ func buildRulesFromConfig(cfg map[string]config.AccessRuleConfig) map[string]Rul
 	rules := make(map[string]Rule)
 
 	for endpoint, rule := range cfg {
-		roles := make([]models.Role, 0, len(rule.Role))
-		for _, r := range rule.Role {
+		roles := make([]models.Role, 0, len(rule.Roles))
+		for _, r := range rule.Roles {
 			roles = append(roles, models.Role(r))
 		}
 

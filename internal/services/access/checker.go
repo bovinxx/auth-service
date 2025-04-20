@@ -49,7 +49,6 @@ func (c *StaticChecker) HasAccess(userRole models.Role, endpoint string) bool {
 
 func (s *Serv) Check(ctx context.Context, endpoint string) (bool, error) {
 	endpoint = strings.ToLower(endpoint)
-
 	if s.isEndpointPublic(endpoint) {
 		return true, nil
 	}
