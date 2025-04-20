@@ -8,7 +8,7 @@ import (
 	"github.com/bovinxx/auth-service/internal/utils"
 )
 
-func (s *serv) Logout(ctx context.Context, refreshToken string) error {
+func (s *Serv) Logout(ctx context.Context, refreshToken string) error {
 	cacheKey := utils.NewCacheKey(sessionCacheKeyPrefix, refreshToken)
 	err := s.cache.Del(ctx, cacheKey)
 	if err != nil {

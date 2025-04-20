@@ -10,7 +10,7 @@ import (
 	serviceerrs "github.com/bovinxx/auth-service/internal/services/user/errors"
 )
 
-func (s *serv) CreateUser(ctx context.Context, user *models.User) (int64, error) {
+func (s *Serv) CreateUser(ctx context.Context, user *models.User) (int64, error) {
 	id, err := s.repo.CreateUser(ctx, user)
 	if err != nil {
 		if errors.Is(err, repoerrs.ErrUserAlreadyExists) {

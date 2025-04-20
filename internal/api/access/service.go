@@ -6,18 +6,18 @@ import (
 	desc "github.com/bovinxx/auth-service/pkg/access_v1"
 )
 
-//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
+// go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
 
-type AccessService interface {
+type Service interface {
 	Check(ctx context.Context, endpoint string) (bool, error)
 }
 
 type Implementation struct {
 	desc.UnimplementedAccessServiceServer
-	service AccessService
+	service Service
 }
 
-func NewImplementation(service AccessService) *Implementation {
+func NewImplementation(service Service) *Implementation {
 	return &Implementation{
 		service: service,
 	}

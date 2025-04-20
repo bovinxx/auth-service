@@ -7,9 +7,9 @@ import (
 	desc "github.com/bovinxx/auth-service/pkg/auth_v1"
 )
 
-//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
+// go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
 
-type AuthService interface {
+type Service interface {
 	Login(ctx context.Context, req *models.User) (string, error)
 	Logout(ctx context.Context, refreshToken string) error
 	GetRefreshToken(ctx context.Context, token *models.Token) (*models.Token, error)
@@ -18,10 +18,10 @@ type AuthService interface {
 
 type Implementation struct {
 	desc.UnimplementedAuthServiceServer
-	service AuthService
+	service Service
 }
 
-func NewImplementation(service AuthService) *Implementation {
+func NewImplementation(service Service) *Implementation {
 	return &Implementation{
 		service: service,
 	}

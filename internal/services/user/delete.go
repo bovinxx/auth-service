@@ -9,7 +9,7 @@ import (
 	serviceerrs "github.com/bovinxx/auth-service/internal/services/user/errors"
 )
 
-func (s *serv) DeleteUser(ctx context.Context, id int64) error {
+func (s *Serv) DeleteUser(ctx context.Context, id int64) error {
 	err := s.repo.DeleteUser(ctx, id)
 	if err != nil {
 		if errors.Is(err, repoerrs.ErrUserNotExists) {

@@ -24,17 +24,17 @@ const (
 	roleColumn     = "role"
 )
 
-type repo struct {
+type Repo struct {
 	db db.Client
 }
 
-func NewRepository(db db.Client) (*repo, error) {
-	return &repo{
+func NewRepository(db db.Client) (*Repo, error) {
+	return &Repo{
 		db: db,
 	}, nil
 }
 
-func (r *repo) CreateUser(ctx context.Context, user *models.User) (int64, error) {
+func (r *Repo) CreateUser(ctx context.Context, user *models.User) (int64, error) {
 	if _, err := r.GetUserByUsername(ctx, user.Name); err == nil {
 		return 0, errors.ErrUserAlreadyExists
 	}
@@ -69,7 +69,7 @@ func (r *repo) CreateUser(ctx context.Context, user *models.User) (int64, error)
 	return id, nil
 }
 
-func (r *repo) GetUserByID(ctx context.Context, id int64) (*models.User, error) {
+func (r *Repo) GetUserByID(ctx context.Context, id int64) (*models.User, error) {
 	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -94,7 +94,7 @@ func (r *repo) GetUserByID(ctx context.Context, id int64) (*models.User, error) 
 	return converter.ToUserFromRepo(user), nil
 }
 
-func (r *repo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (r *Repo) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	builderSelect := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -119,7 +119,7 @@ func (r *repo) GetUserByUsername(ctx context.Context, username string) (*models.
 	return converter.ToUserFromRepo(user), nil
 }
 
-func (r *repo) UpdateUser(ctx context.Context, id int64, newPassword string) error {
+func (r *Repo) UpdateUser(ctx context.Context, id int64, newPassword string) error {
 	hashNewPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %v", err)
@@ -147,7 +147,7 @@ func (r *repo) UpdateUser(ctx context.Context, id int64, newPassword string) err
 	return nil
 }
 
-func (r *repo) DeleteUser(ctx context.Context, id int64) error {
+func (r *Repo) DeleteUser(ctx context.Context, id int64) error {
 	deleteBuilder := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{idColumn: id})

@@ -8,7 +8,7 @@ import (
 	"github.com/bovinxx/auth-service/internal/utils"
 )
 
-func (s *serv) Login(ctx context.Context, req *models.User) (string, error) {
+func (s *Serv) Login(ctx context.Context, req *models.User) (string, error) {
 	user, err := s.getUserByUsername(ctx, req.Name)
 	if err != nil {
 		return "", err
