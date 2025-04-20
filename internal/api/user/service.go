@@ -7,7 +7,7 @@ import (
 	desc "github.com/bovinxx/auth-service/pkg/user_v1"
 )
 
-//go generate mockgen -source=service.go
+//go generate mockgen -source=service.go -destination=service_mock/mock.go -package=mock
 
 type UserService interface {
 	CreateUser(ctx context.Context, user *models.User) (int64, error)

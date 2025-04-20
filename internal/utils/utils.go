@@ -14,3 +14,7 @@ func VerifyPassword(hashedPassword, candidatePassword string) bool {
 func NewCacheKey(prefix, username string) string {
 	return fmt.Sprintf("%s:%s", prefix, username)
 }
+
+func HashPassword(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+}
